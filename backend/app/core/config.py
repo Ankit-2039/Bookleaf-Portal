@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     llm_api_key: str = ""
     llm_timeout_seconds: int = 20
 
+    seed_author_password: str = ""
+    seed_admin_password: str = ""
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
