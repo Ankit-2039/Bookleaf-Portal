@@ -6,7 +6,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     app_env: str = "development"
-    database_url: str = "sqlite:///./bookleaf.db"
+    mongodb_uri: str = "mongodb://localhost:27017"
+    mongodb_db: str = "bookleaf"
 
     jwt_secret: str  # required: app refuses to start without it
     jwt_algorithm: str = "HS256"
@@ -14,9 +15,10 @@ class Settings(BaseSettings):
 
     cors_origins: str = "http://localhost:5173"
 
-    llm_provider: str = "anthropic"
-    llm_model: str = ""
-    anthropic_api_key: str = ""
+    llm_provider: str = "groq"
+    llm_model: str = "openai/gpt-oss-120b"
+    llm_base_url: str = "https://api.groq.com/openai/v1"
+    llm_api_key: str = ""
     llm_timeout_seconds: int = 20
 
     @property
