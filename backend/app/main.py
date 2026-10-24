@@ -1,5 +1,8 @@
 from contextlib import asynccontextmanager
 
+from app.api.router import api_router
+from app.core.errors import register_error_handlers
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -23,6 +26,9 @@ app = FastAPI(
     description="Author and admin support ticketing with AI-assisted triage and drafting.",
     lifespan=lifespan,
 )
+
+register_error_handlers(app)
+app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
