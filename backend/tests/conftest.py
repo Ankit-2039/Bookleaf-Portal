@@ -57,6 +57,7 @@ def sync_db():
         user("inactive@test.dev", "Inactive", "author", active=False),
         user("author2@test.dev", "Second Author", "author"),
         user("empty@test.dev", "Empty Author", "author"),
+        user("admin2@test.dev", "Second Admin", "admin"),
     ])
 
     def author(email, code):
@@ -111,3 +112,8 @@ def empty_h(client):
 @pytest.fixture(scope="session")
 def admin_h(client):
     return _headers(client, "admin@test.dev")
+
+
+@pytest.fixture(scope="session")
+def admin2_h(client):
+    return _headers(client, "admin2@test.dev")
