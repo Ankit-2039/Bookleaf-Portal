@@ -84,3 +84,8 @@ def kb_context(category: TicketCategory, include_tone: bool = True) -> str:
     """Only the sections relevant to this category: this is how we control prompt size."""
     keys = list(CATEGORY_SECTIONS[category]) + (["tone"] if include_tone else [])
     return "\n\n".join(KB_SECTIONS[k] for k in keys)
+
+def kb_context_all() -> str:
+    """Whole knowledge base: used only when a ticket's category is not yet confirmed."""
+    order = ["company", "royalty", "isbn", "metadata_updates", "printing", "distribution", "production", "tone"]
+    return "\n\n".join(KB_SECTIONS[k] for k in order)

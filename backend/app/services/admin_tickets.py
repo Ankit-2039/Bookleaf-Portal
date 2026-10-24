@@ -234,6 +234,7 @@ async def build_detail(db, t: dict) -> AdminTicketDetail:
             ai_confidence=t.get("ai_confidence"),
             ai_rationale=t.get("ai_rationale"),
             classified_at=t.get("classified_at"),
+            error_code=t.get("ai_error"),
         ),
         messages=[_message_out(m, users) for m in msgs],
         audit=[

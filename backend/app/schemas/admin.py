@@ -51,6 +51,7 @@ class AiTriage(BaseModel):
     ai_confidence: float | None
     ai_rationale: str | None
     classified_at: datetime | None
+    error_code: str | None = None  # why the last triage attempt failed, if it did
 
 
 class AdminMessageOut(BaseModel):
@@ -125,3 +126,11 @@ class AdminMetrics(BaseModel):
     avg_resolution_hours: float | None  # null until at least one ticket has been resolved
     urgent_queue: list[AdminTicketListItem]     # top 5 by urgency
     longest_waiting: list[AdminTicketListItem]  # 5 oldest unresolved
+
+
+class DraftResponse(BaseModel):
+    draft: str
+    verify_before_sending: list[str]
+    warnings: list[str]
+    model: str
+    generated_at: datetime

@@ -6,6 +6,7 @@ from app.ai.prompts import TRIAGE_SYSTEM, build_draft_system, build_draft_user, 
 from app.models.enums import TicketCategory, TicketPriority
 from tests.fakes import make_book, make_ctx
 from decimal import Decimal
+from app.ai.knowledge_base import kb_context_all
 
 
 # ---------- knowledge base ----------
@@ -101,3 +102,15 @@ def test_overdue_payout_signal_only_for_published_never_paid_books():
                        last_payout_date=None, publication_date=date(2026, 9, 1))
     assert "appears overdue" not in build_draft_user(make_ctx(book=recent))  # inside the payout window
     assert "appears overdue" not in build_draft_user(make_ctx(book=None))
+
+
+def test_full_kb_has_every_section_and_is_used_when_category_unconfirmed():
+    full = kb_context_all()
+    assert all(s in full for s in ["45 days", "stock sync", "reprint", "Proofreading", "COMMUNICATION TONE"])
+    assert "stock sync" in build_draft_system(TicketCategory.ROYALTY, all_sections=True)
+    assert "stock sync" not in build_draft_system(TicketCategory.ROYALTY)
+
+
+def test_unconfirmed_category_is_not_presented_as_fact():
+    user = build_draft_user(make_ctx(category_reliable=False))
+    assert "not yet confirmed" in user and "category: Royalty & Payments" not in user

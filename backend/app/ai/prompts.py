@@ -3,8 +3,7 @@ from decimal import Decimal
 from app.ai.context import BookFacts, TicketContext
 from app.ai.knowledge_base import kb_context
 from app.models.enums import TicketCategory
-
-from app.ai.knowledge_base import PAYOUT_THRESHOLD_INR, kb_context
+from app.ai.knowledge_base import PAYOUT_THRESHOLD_INR, kb_context, kb_context_all
 
 TRIAGE_DESC_CHARS = 1500
 DRAFT_DESC_CHARS = 3000
@@ -145,15 +144,18 @@ def payout_signal(ctx: TicketContext) -> str | None:
     return None
 
 
-def build_draft_system(category: TicketCategory) -> str:
-    return f"{_DRAFT_RULES}\n\nBOOKLEAF POLICY (the only policy you may rely on)\n{kb_context(category)}\n\n{_DRAFT_OUTPUT}"
+def build_draft_system(category: TicketCategory, all_sections: bool = False) -> str:
+    policy = kb_context_all() if all_sections else kb_context(category)
+    return f"{_DRAFT_RULES}\n\nBOOKLEAF POLICY (the only policy you may rely on)\n{policy}\n\n{_DRAFT_OUTPUT}"
 
 
 def build_draft_user(ctx: TicketContext) -> str:
+    cat_label = ctx.category.value if ctx.category_reliable else "not yet confirmed (decide from the ticket text)"
+    pri_label = ctx.priority.value if ctx.category_reliable else "not yet confirmed"
     facts = [
         f"Today's date: {ctx.today.isoformat()}",
         f"Ticket: TKT-{ctx.ticket_number} | status: {ctx.status} | opened: {ctx.created_at.date().isoformat()} | "
-        f"category: {ctx.category.value} | priority: {ctx.priority.value}",
+        f"category: {cat_label} | priority: {pri_label}",
         f"Author first name: {ctx.author_first_name}",
         "Book:",
         render_book_facts(ctx.book, ctx.today),

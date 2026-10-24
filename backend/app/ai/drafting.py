@@ -73,7 +73,7 @@ async def draft_response(client: AIClient, ctx: TicketContext, *, ticket_id=None
         client,
         purpose="draft",
         ticket_id=ticket_id,
-        system=build_draft_system(ctx.category),
+        system=build_draft_system(ctx.category, all_sections=not ctx.category_reliable),
         user=build_draft_user(ctx),
         schema=DraftResult,
         max_tokens=2500,

@@ -52,6 +52,7 @@ def reply(client, headers, n, **over):
 ADMIN_ROUTES = [
     ("GET", "/metrics"), ("GET", "/admins"), ("GET", "/tickets"), ("GET", "/tickets/1"),
     ("PATCH", "/tickets/1"), ("POST", "/tickets/1/notes"), ("POST", "/tickets/1/replies"),
+    ("POST", "/tickets/1/draft"), ("POST", "/tickets/1/triage"),
 ]
 
 
@@ -163,7 +164,7 @@ def test_detail_has_author_book_ai_and_empty_history(client, admin_h, author_h, 
     assert d["book_detail"]["title"] == "Test Published Book"
     assert d["book_detail"]["royalty_pending"] == 600
     assert d["description"] == BODY["description"]
-    assert d["classification_status"] == "pending"
+    assert d["classification_status"] == "failed"  # AI is unconfigured in tests; the failure is recorded honestly
     assert d["ai"]["ai_category"] is None and d["ai"]["ai_priority"] is None
     assert d["messages"] == [] and d["audit"] == []
 

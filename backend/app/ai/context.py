@@ -41,4 +41,5 @@ class TicketContext:
     book: BookFacts | None
     today: date
     author_total_pending: Decimal | None = None
+    category_reliable: bool = True  # False while triage is pending/failed and no admin override exists
     history: list[HistoryMessage] = field(default_factory=list)

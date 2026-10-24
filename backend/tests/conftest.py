@@ -3,6 +3,7 @@ import os
 # Must happen BEFORE importing the app: env vars override .env in pydantic-settings.
 os.environ["MONGODB_DB"] = "bookleaf_test"
 os.environ["JWT_SECRET"] = "test-secret-not-for-production-use-only-32+bytes"
+os.environ["LLM_API_KEY"] = ""  # tests must never use a real key
 
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -117,3 +118,18 @@ def admin_h(client):
 @pytest.fixture(scope="session")
 def admin2_h(client):
     return _headers(client, "admin2@test.dev")
+
+
+@pytest.fixture(autouse=True)
+def _no_real_llm(monkeypatch):
+    """Default for every test: AI is 'not configured' (fails fast, no network). Tests opt in to a fake."""
+    from app.ai.provider import UnconfiguredProvider
+    monkeypatch.setattr("app.ai.deps.get_provider", lambda: UnconfiguredProvider())
+
+
+@pytest.fixture
+def use_provider(monkeypatch):
+    def _use(provider):
+        monkeypatch.setattr("app.ai.deps.get_provider", lambda: provider)
+        return provider
+    return _use

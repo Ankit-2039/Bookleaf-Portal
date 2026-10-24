@@ -19,6 +19,13 @@ from app.schemas.admin import (
 from app.schemas.common import Page
 from app.services import admin_tickets as svc
 
+from app.ai.client import AIClient
+from app.ai.deps import get_ai_client
+from app.ai.errors import AIError
+from app.core.clock import utcnow
+from app.schemas.admin import DraftResponse
+from app.services import ai_tickets as ai_svc
+
 # Router-level dependency: every route here requires an authenticated ADMIN.
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
 
@@ -90,3 +97,28 @@ async def send_reply(
         response.status_code = 200  # idempotent retry: same message returned, nothing duplicated
     # Step 8 hooks in here: after persisting a NEW public reply, push it to the author's WebSocket.
     return await svc.message_out(db, message)
+
+
+@router.post("/tickets/{ticket_number}/draft", response_model=DraftResponse)
+async def generate_draft(ticket_number: int, db=Depends(get_db), client: AIClient = Depends(get_ai_client)):
+    """AI-drafted reply for the admin to edit. Nothing is saved or sent here."""
+    ticket = await svc.get_ticket(db, ticket_number)
+    try:
+        out = await ai_svc.generate_draft(db, ticket, client)
+    except AIError as e:
+        raise ai_svc.ai_http_error(e)
+    return DraftResponse(
+        draft=out.draft, verify_before_sending=out.verify_before_sending,
+        warnings=out.warnings, model=out.model, generated_at=utcnow(),
+    )
+
+
+@router.post("/tickets/{ticket_number}/triage", response_model=AdminTicketDetail)
+async def retriage(ticket_number: int, db=Depends(get_db), client: AIClient = Depends(get_ai_client)):
+    """Re-run AI classification (e.g. after a failure). Admin overrides are never overwritten."""
+    ticket = await svc.get_ticket(db, ticket_number)
+    try:
+        await ai_svc.run_triage(db, ticket["_id"], client, force=True)
+    except AIError as e:
+        raise ai_svc.ai_http_error(e, "You can still set the category and priority manually.")
+    return await svc.build_detail(db, await svc.get_ticket(db, ticket_number))
