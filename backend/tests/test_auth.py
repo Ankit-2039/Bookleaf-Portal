@@ -89,7 +89,7 @@ def test_me_with_expired_token(client, sync_db):
 
 def test_me_with_token_signed_by_wrong_secret(client, sync_db):
     uid = str(sync_db.users.find_one({"email": "admin@test.dev"})["_id"])
-    forged = jwt.encode({"sub": uid, "role": "admin", "exp": 9999999999}, "attacker-key", algorithm="HS256")
+    forged = jwt.encode({"sub": uid, "role": "admin", "exp": 9999999999}, "attacker-key-that-is-long-enough-for-hs256", algorithm="HS256",)
     assert client.get("/api/v1/auth/me", headers=auth(forged)).status_code == 401
 
 

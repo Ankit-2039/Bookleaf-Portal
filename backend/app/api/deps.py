@@ -60,3 +60,12 @@ async def require_author(user: CurrentUser = Depends(get_current_user)) -> Curre
     if user.role != UserRole.AUTHOR:
         raise AppError(403, "forbidden", "Author access required.")
     return user
+
+async def get_author_profile(
+    user: CurrentUser = Depends(require_author), db=Depends(get_db)
+) -> dict:
+    """The authenticated author's profile document. All author data is scoped by its _id."""
+    author = await db.authors.find_one({"user_id": user.oid})
+    if author is None:
+        raise AppError(403, "no_author_profile", "No author profile is linked to this account.")
+    return author
