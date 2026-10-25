@@ -220,7 +220,13 @@ A WebSocket (`/api/v1/ws`) carries content-free events. Authentication is the fi
 
 ## Deployment
 
-[Fill after Step 14: hosting, environment variables set, build and start commands, and the date you verified the live URL.]
+- **Frontend:** Vercel (Vite static build; `vercel.json` rewrites all routes to `index.html`).
+- **API:** Render free web service, single worker (`uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1`), Python 3.12.3.
+- **Database:** MongoDB Atlas (free tier), database `bookleaf_demo`, least-privilege user, IP allowlist `0.0.0.0/0` because the free API tier has no fixed IP.
+- Configuration is by environment variables only (see the table above). Production mode refuses a JWT secret under 32 characters or a `localhost` CORS origin.
+- Verified live on [25-10-2026]: [https://bookleaf-portal-puce.vercel.app]
+
+**Note for reviewers:** the free API instance sleeps after about 15 minutes without traffic and takes roughly a minute to wake up. If the first login fails, open `[API URL]/health`, wait until it answers, then retry. AI features use a shared API key with rate limits; if they are throttled, the app degrades to manual replies as designed.
 
 ## Demo credentials
 
