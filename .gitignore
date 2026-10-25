@@ -13,6 +13,9 @@ __pycache__/
 node_modules/
 dist/
 
+# Databases
+*.db
+
 # IDE / OS
 .vscode/
 .idea/
