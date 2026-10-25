@@ -98,11 +98,7 @@ export function TriagePanel({ ticket, onChanged, onError }: Props) {
       {ai.ai_rationale && (
         <div className="rounded-md bg-stone-50 p-3 text-xs text-stone-600">
           <p>{ai.ai_rationale}</p>
-          {ai.ai_confidence != null && (
-            <p className="mt-1 text-stone-400">
-              Model confidence {Math.round(ai.ai_confidence * 100)}%. This is the model's own estimate, not a measured accuracy.
-            </p>
-          )}
+          <p className="mt-1 text-stone-400">AI suggestions are advisory. Review them before relying on them.</p>
         </div>
       )}
 
