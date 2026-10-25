@@ -18,3 +18,7 @@ export const ALLOWED_TRANSITIONS: Record<TicketStatus, TicketStatus[]> = {
   Resolved: ['In Progress', 'Closed'],
   Closed: [],
 }
+
+// An unresolved ticket's age turns amber, then red, past these thresholds.
+export const AGE_WARN_HOURS = 48
+export const AGE_ALERT_HOURS = 168 // 7 days

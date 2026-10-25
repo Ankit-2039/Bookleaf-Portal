@@ -29,3 +29,21 @@ export function timeAgo(value: string, now: number): string {
   const days = Math.floor(hours / 24)
   return `${days} day${days === 1 ? '' : 's'} ago`
 }
+
+/** Compact ticket age: "just now", "35 min", "7 h", "4 days". */
+export function formatAge(value: string, now: number): string {
+  const mins = Math.max(0, Math.floor((now - new Date(value).getTime()) / 60_000))
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins} min`
+  const hours = Math.floor(mins / 60)
+  if (hours < 48) return `${hours} h`
+  return `${Math.floor(hours / 24)} days`
+}
+
+/** Average resolution time given in hours. */
+export function formatHours(hours: number | null | undefined): string {
+  if (hours == null) return '—'
+  if (hours < 1) return `${Math.round(hours * 60)} min`
+  if (hours < 48) return `${hours.toFixed(1)} h`
+  return `${(hours / 24).toFixed(1)} days`
+}
