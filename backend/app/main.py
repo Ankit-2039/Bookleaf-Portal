@@ -42,4 +42,4 @@ app.add_middleware(
 @app.get("/health", tags=["system"])
 async def health():
     await mongo.get_db().command("ping")
-    return {"status": "ok", "env": settings.app_env, "db": "ok"}
+    return {"status": "ok", "db": "ok"}
