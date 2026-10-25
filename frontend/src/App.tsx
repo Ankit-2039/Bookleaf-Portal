@@ -6,6 +6,11 @@ import { AuthorLayout } from './layouts/AuthorLayout'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { PlaceholderPage } from './pages/PlaceholderPage'
+import { BooksPage } from './pages/author/BooksPage'
+import { DashboardPage } from './pages/author/DashboardPage'
+import { NewTicketPage } from './pages/author/NewTicketPage'
+import { TicketDetailPage } from './pages/author/TicketDetailPage'
+import { TicketsPage } from './pages/author/TicketsPage'
 
 export default function App() {
   return (
@@ -18,11 +23,11 @@ export default function App() {
           <Route element={<RequireRole role="author" />}>
             <Route element={<AuthorLayout />}>
               <Route path="/author" element={<Navigate to="/author/dashboard" replace />} />
-              <Route path="/author/dashboard" element={<PlaceholderPage title="Dashboard" />} />
-              <Route path="/author/books" element={<PlaceholderPage title="My Books" />} />
-              <Route path="/author/tickets" element={<PlaceholderPage title="My Tickets" />} />
-              <Route path="/author/tickets/new" element={<PlaceholderPage title="Submit a Support Query" />} />
-              <Route path="/author/tickets/:ticketNumber" element={<PlaceholderPage title="Ticket" />} />
+              <Route path="/author/dashboard" element={<DashboardPage />} />
+              <Route path="/author/books" element={<BooksPage />} />
+              <Route path="/author/tickets" element={<TicketsPage />} />
+              <Route path="/author/tickets/new" element={<NewTicketPage />} />
+              <Route path="/author/tickets/:ticketNumber" element={<TicketDetailPage />} />
             </Route>
           </Route>
 
