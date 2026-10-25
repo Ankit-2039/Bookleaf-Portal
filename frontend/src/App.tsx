@@ -5,7 +5,6 @@ import { AdminLayout } from './layouts/AdminLayout'
 import { AuthorLayout } from './layouts/AuthorLayout'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage } from './pages/NotFoundPage'
-import { PlaceholderPage } from './pages/PlaceholderPage'
 import { BooksPage } from './pages/author/BooksPage'
 import { DashboardPage } from './pages/author/DashboardPage'
 import { NewTicketPage } from './pages/author/NewTicketPage'
@@ -13,6 +12,7 @@ import { TicketDetailPage } from './pages/author/TicketDetailPage'
 import { TicketsPage } from './pages/author/TicketsPage'
 import { AdminDashboardPage } from './pages/admin/DashboardPage'
 import { QueuePage } from './pages/admin/QueuePage'
+import { TicketWorkspacePage } from './pages/admin/TicketWorkspacePage'
 
 export default function App() {
   return (
@@ -38,7 +38,7 @@ export default function App() {
               <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
               <Route path="/admin/tickets" element={<QueuePage />} />
-              <Route path="/admin/tickets/:ticketNumber" element={<PlaceholderPage title="Ticket" />} />
+              <Route path="/admin/tickets/:ticketNumber" element={<TicketWorkspacePage />} />
             </Route>
           </Route>
 
