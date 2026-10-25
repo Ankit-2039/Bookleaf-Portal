@@ -17,8 +17,7 @@ def verify_password(plain: str, hashed: str) -> bool:
     except ValueError:
         return False
 
-
-def create_access_token(user_id: str, role: str, expires_minutes: int | None = None) -> str:
+def create_access_token(user_id: str, role: str, expires_minutes: float | None = None) -> str:
     s = get_settings()
     now = datetime.now(timezone.utc)
     minutes = s.access_token_minutes if expires_minutes is None else expires_minutes

@@ -63,9 +63,13 @@ def check_draft(draft: str, ctx: TicketContext) -> list[str]:
         warnings.append("Draft promises a payout. Only send this if finance has confirmed it.")
     return warnings
 
+SIGN_OFF = "BookLeaf Support Team"
 
 def _clean(text: str) -> str:
-    return re.sub(r"\*\*|__", "", text).strip()  # plain text only
+    text = re.sub(r"\*\*|__", "", text).strip()  # plain text only
+    if text.endswith(SIGN_OFF):  # the model sometimes glues the sign-off to the last sentence
+        text = f"{text[: -len(SIGN_OFF)].rstrip()}\n\n{SIGN_OFF}"
+    return text
 
 
 async def draft_response(client: AIClient, ctx: TicketContext, *, ticket_id=None) -> DraftOutcome:

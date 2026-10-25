@@ -25,6 +25,7 @@ from app.ai.errors import AIError
 from app.core.clock import utcnow
 from app.schemas.admin import DraftResponse
 from app.services import ai_tickets as ai_svc
+from app.realtime import events
 
 # Router-level dependency: every route here requires an authenticated ADMIN.
 router = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(require_admin)])
@@ -72,6 +73,7 @@ async def update_ticket(
 ):
     ticket = await svc.get_ticket(db, ticket_number)
     updated = await svc.patch_ticket(db, admin, ticket, body)
+    await events.after_patch(ticket, updated)
     return await svc.build_detail(db, updated)
 
 
@@ -80,7 +82,9 @@ async def add_note(
     ticket_number: int, body: NoteCreate, admin: CurrentUser = Depends(require_admin), db=Depends(get_db)
 ):
     ticket = await svc.get_ticket(db, ticket_number)
-    return await svc.message_out(db, await svc.add_note(db, admin, ticket, body))
+    note = await svc.add_note(db, admin, ticket, body)
+    await events.after_note(ticket)  # admins only: the author is never told about internal notes
+    return await svc.message_out(db, note)
 
 
 @router.post("/tickets/{ticket_number}/replies", response_model=AdminMessageOut, status_code=201)
@@ -93,9 +97,10 @@ async def send_reply(
 ):
     ticket = await svc.get_ticket(db, ticket_number)
     message, created = await svc.add_reply(db, admin, ticket, body)
-    if not created:
-        response.status_code = 200  # idempotent retry: same message returned, nothing duplicated
-    # Step 8 hooks in here: after persisting a NEW public reply, push it to the author's WebSocket.
+    if created:
+        await events.after_reply(ticket)  # persisted first, then pushed to the author and the admins
+    else:
+        response.status_code = 200  # idempotent retry: same message returned, nobody notified twice
     return await svc.message_out(db, message)
 
 

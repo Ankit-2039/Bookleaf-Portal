@@ -21,6 +21,7 @@ from app.models.enums import (
     TicketPriority,
     TicketStatus,
 )
+from app.realtime import events
 
 logger = logging.getLogger("bookleaf.ai")
 
@@ -153,8 +154,10 @@ async def run_triage(db, ticket_oid, client: AIClient, *, force: bool = False) -
         result = await triage_ticket(client, ctx, ticket_id=ticket_oid)
     except AIError as e:
         await _mark_failed(db, ticket_oid, e.code)
+        await events.after_triage_failed(ticket)
         raise
     await apply_triage(db, ticket, result)
+    await events.after_triage(ticket)
     return result
 
 

@@ -13,6 +13,7 @@ from app.services import books as book_svc
 from app.services import tickets as ticket_svc
 from fastapi import BackgroundTasks
 from app.services import ai_tickets as ai_svc
+from app.realtime import events
 
 # Every route below requires an authenticated AUTHOR (require_author is applied via get_author_profile).
 router = APIRouter(prefix="/author", tags=["author"])
@@ -49,7 +50,7 @@ async def create_ticket(
     db=Depends(get_db),
 ):
     ticket, book = await ticket_svc.create_ticket(db, author, body)
-    # Triage runs after the response is sent; the ticket exists whatever the AI does.
+    await events.after_created(ticket)  # admins see it in the queue immediately
     background.add_task(ai_svc.triage_in_background, ticket["_id"])
     return ticket_svc.to_author_detail(ticket, book, [], user)
 

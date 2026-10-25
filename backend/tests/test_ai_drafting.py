@@ -86,3 +86,9 @@ def test_hypothetical_phrasing_is_not_flagged_but_real_claims_are():
     assert check_draft("The payment should have been processed by now.", make_ctx()) == []
     assert check_draft("This would have been resolved sooner.", make_ctx()) == []
     assert len(check_draft("Your payment has been processed.", make_ctx())) == 1
+
+
+def test_signoff_is_moved_to_its_own_paragraph():
+    out = run(FakeProvider(reply(
+        "Hi Priya, thanks for writing in. Our team will reply within 48 hours. Thank you. BookLeaf Support Team")))
+    assert out.draft.endswith("\n\nBookLeaf Support Team") and out.draft.count("BookLeaf Support Team") == 1
